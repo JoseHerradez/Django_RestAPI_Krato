@@ -7,17 +7,17 @@ class Ciudad(models.Model):
 
     def __str__(self):
         return self.nombre
-    
+
     class Meta:
         ordering = ('nombre',)
 
 
 class Tienda(models.Model):
-    """Modelo de Ciudad. Relación Many-to-Many con Usuario mediante usuario_set.
+    """Modelo de Ciudad. Relación Many-to-Many con Usuario mediante 'usuarios'.
     Relación One-To-Many con Ciudad."""
     nombre = models.CharField(max_length=50)
     ubicacion = models.CharField(max_length=150)
-    ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE)
+    ciudad = models.ForeignKey(Ciudad, related_name='tiendas', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.nombre
@@ -31,7 +31,7 @@ class Usuario(models.Model):
     nombre = models.CharField(max_length=50)
     cedula = models.PositiveIntegerField()
     residencia = models.CharField(max_length=150, blank=True)
-    tiendas = models.ManyToManyField(Tienda)
+    tiendas = models.ManyToManyField(Tienda, related_name='usuarios')
 
     def __str__(self):
         return "{}: {}".format(self.nombre, self.cedula)
