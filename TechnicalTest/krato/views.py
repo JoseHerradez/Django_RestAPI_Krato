@@ -16,6 +16,18 @@ class CiudadViewSet(
     queryset = Ciudad.objects.all()
     serializer_class = CiudadSerializer
 
+    @detail_route(methods=['get'], url_path='usuarios/(?P<user_id>[0-9]+)')
+    def get_storesByUser(self, request, pk=None, user_id=None):
+        """
+        Retorna una lista de todas las tiendas que pertenecen
+        a la ciudad y asociadas al usuario indicado.
+        """
+        ciudad = self.get_object()
+        tiendas = ciudad.tiendas.all()
+        tiendas = tiendas.filter(usuarios__pk=user_id)
+        serializer = TiendaSerializer(tiendas, many=True, context={'request':request})
+        return Response(serializer.data)
+
 
 class TiendaViewSet(
         mixins.ListModelMixin,
@@ -35,11 +47,8 @@ class TiendaViewSet(
         a la tienda seleccionada.
         """
         tienda = self.get_object()
-        serializer_context = {
-            'request': request,
-        }
         usuarios = tienda.usuarios.all()
-        serializer = UsuarioSerializer(usuarios, many=True, context=serializer_context)
+        serializer = UsuarioSerializer(usuarios, many=True, context={'request':request})
         return Response(serializer.data)
 
 
@@ -61,9 +70,6 @@ class UsuarioViewSet(
         al usuario seleccionado.
         """
         usuario = self.get_object()
-        serializer_context = {
-            'request': request,
-        }
         tiendas = usuario.tiendas.all()
-        serializer = TiendaSerializer(tiendas, many=True, context=serializer_context)
+        serializer = TiendaSerializer(tiendas, many=True, context={'request':request})
         return Response(serializer.data)
